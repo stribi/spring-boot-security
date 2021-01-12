@@ -15,11 +15,11 @@ import com.stribi.springsecurity.domain.Student;
 public class StudentController {
 	
 	private static final List<Student> STUDENTS = Arrays.asList(
-				new Student(1L, "Stribor Popovic"),
-				new Student(2L, "Stribor Popovic"),
-				new Student(3L, "Stribor Popovic"),
-				new Student(4L, "Stribor Popovic")			
-			);
+			new Student(1L, "Stribor Popovic"),
+			new Student(2L, "Goran Popovic"),
+			new Student(3L, "Borna Srebocan"),
+			new Student(4L, "Vedrana Prpic")			
+		);
 	
 	@GetMapping("/{studentId}")
 	public Student getStudent(@PathVariable Long studentId) {
