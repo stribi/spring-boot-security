@@ -10,10 +10,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 import static com.stribi.springsecurity.domain.ERole.ADMIN;
 import static com.stribi.springsecurity.domain.ERole.STUDENT;
+
+import java.util.concurrent.TimeUnit;
+
 import static com.stribi.springsecurity.domain.ERole.ADMINTRAINEE;
 
 @Configuration
@@ -42,7 +47,25 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 				.anyRequest()
 				.authenticated()
 				.and()
-				.httpBasic();
+				.formLogin()
+				.loginPage("/login")
+				.permitAll()
+				.defaultSuccessUrl("/courses", true)
+				.passwordParameter("password")
+				.usernameParameter("username")
+				.and()
+				.rememberMe()
+					.tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))
+					.key("noentrance")
+					.rememberMeParameter("remember-me")
+				.and()
+				.logout()
+					.logoutUrl("/logout")
+					.logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+					.clearAuthentication(true)
+					.invalidateHttpSession(true)
+					.deleteCookies("JSESSIONID", "remember-me")
+					.logoutSuccessUrl("/login");
 	}
 
 	@Override
@@ -69,13 +92,12 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorities(ADMINTRAINEE.getGrantedAuthorities())
 				.build();
 
-		return new UserDetailsService() {
-
-			@Override
-			public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-				return stribi;
-			}
-		};
+		return new InMemoryUserDetailsManager(
+				
+				gogi,
+				john,
+				stribi
+				);
 
 	}
 
